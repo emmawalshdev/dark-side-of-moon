@@ -3,18 +3,152 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js'
 import * as dat from 'lil-gui'
+import { DoubleSide } from 'three'
+
+// scene
+const scene = new THREE.Scene();
+
+// objects
+const sizes = {
+	height: window.innerHeight,
+	width: window.innerWidth
+}
+
+// camera
+const camera = new THREE.PerspectiveCamera(95, sizes.width/sizes.height, 0.1, 450)
+camera.position.set(200,150, 200)
+//camera.up.set( 1, 0, 0 );
+scene.add(camera)
+
+// canvas
+const canvas = document.querySelector('canvas.webgl');
+
+// renderer
+const renderer = new THREE.WebGLRenderer({
+	canvas: canvas
+});
+
+// controls
+const controls = new OrbitControls(camera, canvas);
+controls.maxPolarAngle = Math.PI
+controls.update();
+console.enableDamping = true;
+// controls.maxDistance = 500;
+// controls.minDistance = 250;
+
+
+// axes helper
+const axesHelper = new THREE.AxesHelper(500);
+axesHelper.setColors('red', 'yellow', 'pink')
+scene.add(axesHelper);
+
+console.log(window.devicePixelRatio)
+// debug
+const gui = new dat.GUI();
+
+// window resize
+window.addEventListener('resize', () => {
+	// update sizes
+	sizes.width = window.innerWidth;
+	sizes.height = window.innerHeight;
+
+	//update camera
+	camera.aspect = sizes.width/sizes.height
+	camera.updateProjectionMatrix()
+
+	//update renderer
+	renderer.setSize(sizes.width, sizes.height);
+	renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+})
+
+// object
+//const geometry = new THREE.BoxGeometry(2,2,2);
+
+// texture loader
+const loadingManager = new THREE.LoadingManager();
+const textureLoader = new THREE.TextureLoader(loadingManager);
+
+const moonTexture = textureLoader.load('/textures/moon-3.png');
+const moonDispTexture = textureLoader.load('/textures/moon-disp.jpg');
+
+
+const material = new THREE.MeshBasicMaterial({ });
+const starMaterial = new THREE.MeshBasicMaterial({color: 'yellow'});
+material.map = moonTexture
+
+// moonTexture.wrapS = THREE.RepeatWrapping
+// moonTexture.wrapT = THREE.RepeatWrapping
+// moonTexture.repeat.x = 2
+// moonTexture.repeat.y = 2
+moonTexture.minFilter = THREE.NearestFilter
+moonTexture.magFilter = THREE.NearestFilter
+moonTexture.generateMipmaps = false
+
+
+for (let i=0; i<100; i++) {
+	const starGeometry = new THREE.TetrahedronGeometry(1, 0);
+	const star = new THREE.Mesh(starGeometry, starMaterial);
+	scene.add(star)
+	star.position.x = (Math.random() - 0.5) * 500
+	star.position.y = (Math.random() - 0.5) * 500
+	star.position.z = (Math.random() - 0.5) * 500
+}
+
+//sphere
+const sphereGeometry = new THREE.SphereGeometry(100,40,16)
+const moon = new THREE.Mesh(sphereGeometry, material);
+//material.wireframe = true
+//scene.add(moon)
+
+// minimoon using phong material
+const miniMoonMaterial = new THREE.MeshPhongMaterial({
+	map: moonTexture,
+	bumpMap: moonDispTexture,
+	displacementMap: moonDispTexture
+})
+const miniMoon = new THREE.Mesh(sphereGeometry, miniMoonMaterial);
+//material.wireframe = true
+scene.add(miniMoon)
+
+// miniMoon.position.z = 200
+
+const clock = new THREE.Clock();
+
+renderer.setSize(sizes.width, sizes.height);
+renderer.render(scene, camera);
+
+const light = new THREE.DirectionalLight(0xFFFFFF, 1);
+light.position.set(-100, 800, 900);
+scene.add(light);
+
+const ambLight = new THREE.AmbientLight( 0x404040 ); // soft white light
+scene.add( ambLight );
+
+// animate on each frame
+
+function animate(){
+	
+	const elapsedTime = clock.getElapsedTime();
+	moon.rotation.y = -(0.1 * elapsedTime)
+	//moon.rotation.z = 0.1 * elapsedTime
+
+
+	controls.autoRotate = true;
+	controls.autoRotateSpeed = 0.6;
+	controls.update();
+
+	window.requestAnimationFrame(animate)
+
+	renderer.render(scene, camera);
+}
+
+animate()
 
 /**
  * Base
  */
 // Debug
 //const gui = new dat.GUI()
-
-// // Canvas
-// const canvas = document.querySelector('canvas.webgl')
-
-// // Scene
-// const scene = new THREE.Scene()
 
 // /**
 //  * Textures
@@ -109,9 +243,7 @@ import * as dat from 'lil-gui'
 // camera.position.z = 2
 // scene.add(camera)
 
-// // Controls
-// const controls = new OrbitControls(camera, canvas)
-// controls.enableDamping = true
+
 
 // /**
 //  * Renderer

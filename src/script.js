@@ -3,7 +3,8 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js'
 import * as dat from 'lil-gui'
-import { DoubleSide } from 'three'
+import gsap from 'gsap'
+import { AmbientLight, DoubleSide, Scene } from 'three'
 
 // scene
 const scene = new THREE.Scene();
@@ -28,19 +29,22 @@ const renderer = new THREE.WebGLRenderer({
 	canvas: canvas
 });
 
+const parameters = {
+	color: '#404040'
+}
 // controls
 const controls = new OrbitControls(camera, canvas);
 controls.maxPolarAngle = Math.PI
 controls.update();
 console.enableDamping = true;
-// controls.maxDistance = 500;
-// controls.minDistance = 250;
+controls.maxDistance = 500;
+controls.minDistance = 160;
 
 
 // axes helper
 const axesHelper = new THREE.AxesHelper(500);
 axesHelper.setColors('red', 'yellow', 'pink')
-scene.add(axesHelper);
+//scene.add(axesHelper);
 
 console.log(window.devicePixelRatio)
 // debug
@@ -58,7 +62,7 @@ window.addEventListener('resize', () => {
 
 	//update renderer
 	renderer.setSize(sizes.width, sizes.height);
-	renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+	renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 })
 
 // object
@@ -68,18 +72,15 @@ window.addEventListener('resize', () => {
 const loadingManager = new THREE.LoadingManager();
 const textureLoader = new THREE.TextureLoader(loadingManager);
 
-const moonTexture = textureLoader.load('/textures/moon-3.png');
+const moonTexture = textureLoader.load('/textures/moon-map.jpg');
 const moonDispTexture = textureLoader.load('/textures/moon-disp.jpg');
-
+const moonAoTexture = textureLoader.load('/textures/moon-2.jpg');
 
 const material = new THREE.MeshBasicMaterial({ });
 const starMaterial = new THREE.MeshBasicMaterial({color: 'yellow'});
 material.map = moonTexture
 
-// moonTexture.wrapS = THREE.RepeatWrapping
-// moonTexture.wrapT = THREE.RepeatWrapping
-// moonTexture.repeat.x = 2
-// moonTexture.repeat.y = 2
+
 moonTexture.minFilter = THREE.NearestFilter
 moonTexture.magFilter = THREE.NearestFilter
 moonTexture.generateMipmaps = false
@@ -104,8 +105,11 @@ const moon = new THREE.Mesh(sphereGeometry, material);
 const miniMoonMaterial = new THREE.MeshPhongMaterial({
 	map: moonTexture,
 	bumpMap: moonDispTexture,
-	displacementMap: moonDispTexture
+	displacementMap: moonDispTexture,
+	shininess: 5,
+	aoMap: moonAoTexture
 })
+
 const miniMoon = new THREE.Mesh(sphereGeometry, miniMoonMaterial);
 //material.wireframe = true
 scene.add(miniMoon)
@@ -118,20 +122,51 @@ renderer.setSize(sizes.width, sizes.height);
 renderer.render(scene, camera);
 
 const light = new THREE.DirectionalLight(0xFFFFFF, 1);
-light.position.set(-100, 800, 900);
+light.position.set(-100, 100, 900);
 scene.add(light);
 
 const ambLight = new THREE.AmbientLight( 0x404040 ); // soft white light
 scene.add( ambLight );
+
+
+gui
+    .add(miniMoonMaterial, 'shininess')
+	.min(0)
+	.max(30)
+	.step(0.1)
+gui
+    .add(miniMoonMaterial, 'wireframe')
+gui
+	.add(light.position,'x')
+	.min(-100)
+	.max(1000)
+	.step(0.001)
+	.name('light-X');
+gui
+	.add(light.position,'y')
+	.min(-100)
+	.max(1000).step(0.001)
+	.name('light-Y');
+gui.add(light.position,'z')
+	.min(-100)
+	.max(1000)
+	.step(0.001)
+	.name('light-Z');
+gui.add(light,'isDirectionalLight')
+    .name('direction light?')
+
+gui.addColor(parameters, 'color')
+    .onChange(()=> {
+		ambLight.color.set(parameters.color)
+	})
+	.name('ambient light color')
 
 // animate on each frame
 
 function animate(){
 	
 	const elapsedTime = clock.getElapsedTime();
-	moon.rotation.y = -(0.1 * elapsedTime)
-	//moon.rotation.z = 0.1 * elapsedTime
-
+	miniMoon.rotation.y = -(0.1 * elapsedTime)
 
 	controls.autoRotate = true;
 	controls.autoRotateSpeed = 0.6;

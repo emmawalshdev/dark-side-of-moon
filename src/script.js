@@ -66,16 +66,16 @@ const moonDispTexture = textureLoader.load('/textures/moon-disp.jpg');
 
 const material = new THREE.MeshBasicMaterial({ });
 const starMaterial = new THREE.MeshBasicMaterial({color: 'yellow'});
+const starGeometry = new THREE.TetrahedronGeometry(1, 0);
 material.map = moonTexture
 
 
 moonTexture.minFilter = THREE.NearestFilter
-moonTexture.magFilter = THREE.NearestFilter;
+moonTexture.magFilter = THREE.NearestFilter
 moonTexture.generateMipmaps = false;
 
 // stars
 for (let i=0; i<100; i++) {
-	const starGeometry = new THREE.TetrahedronGeometry(1, 0);
 	const star = new THREE.Mesh(starGeometry, starMaterial);
 	scene.add(star)
 	star.position.x = (Math.random() - 0.5) * 500
@@ -90,6 +90,7 @@ const sphereGeometry = new THREE.SphereGeometry(100,50,100)
 const miniMoonMaterial = new THREE.MeshPhongMaterial({
 	map: moonTexture,
 	bumpMap: moonDispTexture,
+	bumpScale: 2.5,
 	displacementMap: moonDispTexture,
 	shininess: 5,
 })
@@ -99,7 +100,7 @@ scene.add(miniMoon)
 
 // light
 const light = new THREE.DirectionalLight(0xFFFFFF, 1);
-light.position.set(-100, 100, 900);
+light.position.set(80, 100, 900);
 scene.add(light);
 
 const ambLight = new THREE.AmbientLight(0x404040); // soft white light
@@ -115,7 +116,7 @@ const controls = new OrbitControls(camera, canvas);
 
 controls.enableDamping = true;
 controls.maxDistance = 500;
-controls.minDistance = 160;
+controls.minDistance = 200;
 controls.update();
 
 // gui tool
@@ -146,13 +147,18 @@ gui
 gui
 	.add(light,'isDirectionalLight')
     .name('direction light?')
-
 gui
 	.addColor(parameters, 'color')
     .onChange(()=> {
 		ambLight.color.set(parameters.color)
 	})
 	.name('ambient light color')
+gui
+    .add(miniMoonMaterial, 'bumpScale')
+	.min(0)
+	.max(5)
+	.step(0.001)
+
 
 // animate on each frame
 function animate(){

@@ -166,7 +166,7 @@ gui.addColor(parameters, 'color')
 function animate(){
 	
 	const elapsedTime = clock.getElapsedTime();
-	miniMoon.rotation.y = -(0.1 * elapsedTime)
+	// miniMoon.rotation.y = -(0.1 * elapsedTime)
 
 	controls.autoRotate = true;
 	controls.autoRotateSpeed = 0.6;

@@ -29,6 +29,9 @@ const renderer = new THREE.WebGLRenderer({
 	canvas: canvas
 });
 
+renderer.setSize(sizes.width, sizes.height)
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+
 const parameters = {
 	color: '#404040'
 }
@@ -63,6 +66,7 @@ window.addEventListener('resize', () => {
 	//update renderer
 	renderer.setSize(sizes.width, sizes.height);
 	renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+	
 })
 
 // object
@@ -96,7 +100,7 @@ for (let i=0; i<100; i++) {
 }
 
 //sphere
-const sphereGeometry = new THREE.SphereGeometry(100,40,16)
+const sphereGeometry = new THREE.SphereGeometry(100,50,100)
 const moon = new THREE.Mesh(sphereGeometry, material);
 //material.wireframe = true
 //scene.add(moon)
@@ -168,8 +172,8 @@ function animate(){
 	const elapsedTime = clock.getElapsedTime();
 	// miniMoon.rotation.y = -(0.1 * elapsedTime)
 
-	controls.autoRotate = true;
-	controls.autoRotateSpeed = 0.6;
+	// controls.autoRotate = true;
+	// controls.autoRotateSpeed = 0.6;
 	controls.update();
 
 	window.requestAnimationFrame(animate)

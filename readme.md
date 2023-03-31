@@ -15,4 +15,4 @@ npm run dev
 npm run build
 ```
 ## View the App
-[View the app!]([/guides/content/editing-an-existing-page](https://dark-side-of-moon.vercel.app/))
+[View the app!](https://dark-side-of-moon.vercel.app/))

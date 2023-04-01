@@ -1,4 +1,4 @@
-# Three.js Journey
+# Dark Side of the Moon - Threejs app
 
 ## Setup
 Download [Node.js](https://nodejs.org/en/download/).
@@ -14,3 +14,5 @@ npm run dev
 # Build for production in the dist/ directory
 npm run build
 ```
+## View the App
+[View the app!](https://dark-side-of-moon.vercel.app/)

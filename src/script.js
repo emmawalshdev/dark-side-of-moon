@@ -17,8 +17,8 @@ const sizes = {
 }
 
 // camera
-const camera = new THREE.PerspectiveCamera(95, sizes.width/sizes.height, 0.1, 450)
-camera.position.set(200,150, 200)
+const camera = new THREE.PerspectiveCamera(75, sizes.width/sizes.height, 0.1, 100)
+camera.position.set(1,1, 2)
 //camera.up.set( 1, 0, 0 );
 scene.add(camera)
 
@@ -66,7 +66,7 @@ const moonDispTexture = textureLoader.load('/textures/moon-disp.jpg');
 
 const material = new THREE.MeshBasicMaterial({ });
 const starMaterial = new THREE.MeshBasicMaterial({color: 'yellow'});
-const starGeometry = new THREE.TetrahedronGeometry(1, 0);
+const starGeometry = new THREE.TetrahedronGeometry(0.1, 0);
 material.map = moonTexture
 
 
@@ -78,20 +78,21 @@ moonTexture.generateMipmaps = false;
 for (let i=0; i<100; i++) {
 	const star = new THREE.Mesh(starGeometry, starMaterial);
 	scene.add(star)
-	star.position.x = (Math.random() - 0.5) * 500
-	star.position.y = (Math.random() - 0.5) * 500
-	star.position.z = (Math.random() - 0.5) * 500
+	star.position.x = (Math.random() - 0.5) * 70
+	star.position.y = (Math.random() - 0.5) * 70
+	star.position.z = (Math.random() - 0.5) * 70
 }
 
 // moon
-const sphereGeometry = new THREE.SphereGeometry(100,50,100)
+const sphereGeometry = new THREE.SphereGeometry(0.5,32,32)
 
 //  phong material
 const miniMoonMaterial = new THREE.MeshPhongMaterial({
 	map: moonTexture,
 	bumpMap: moonDispTexture,
-	bumpScale: 2.5,
+	bumpScale: 0.02,
 	displacementMap: moonDispTexture,
+	displacementScale: 0.01,
 	shininess: 5,
 })
 
@@ -100,7 +101,7 @@ scene.add(miniMoon)
 
 // light
 const light = new THREE.DirectionalLight(0xFFFFFF, 1);
-light.position.set(80, 100, 900);
+light.position.set(0, 15, 25);
 scene.add(light);
 
 const ambLight = new THREE.AmbientLight(0x404040); // soft white light
@@ -115,8 +116,8 @@ const parameters = {
 const controls = new OrbitControls(camera, canvas);
 
 controls.enableDamping = true;
-controls.maxDistance = 500;
-controls.minDistance = 200;
+controls.maxDistance = 100;
+controls.minDistance = 1;
 controls.update();
 
 // gui tool
